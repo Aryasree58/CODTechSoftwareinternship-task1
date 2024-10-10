@@ -1,0 +1,80 @@
+package com.automation.tests;
+
+import org.testng.annotations.Test;
+import com.automation.framework.TestBase;
+import com.automation.pages.LoginPage;
+import org.openqa.selenium.By;
+import org.openqa.selenium.WebElement;
+import org.testng.Assert;
+
+public class LoginTest extends TestBase {
+
+    @Test
+    public void testValidLogin() {
+        // Step 1: Navigate to the login page
+        driver.get("https://example.com/login");
+
+        // Create an instance of the LoginPage to access its methods
+        LoginPage loginPage = new LoginPage(driver);
+
+        // Step 2: Input Username
+        loginPage.setUsername("aryasree");
+
+        // Verify that the username field is filled correctly
+        WebElement usernameField = driver.findElement(By.id("username"));
+        String enteredUsername = usernameField.getAttribute("value");
+        Assert.assertEquals(enteredUsername, "aryasree", "Username was not entered correctly!");
+
+        // Step 3: Input Password
+        loginPage.setPassword("12345678");
+
+        // Verify that the password field is filled correctly
+        WebElement passwordField = driver.findElement(By.id("password"));
+        String enteredPassword = passwordField.getAttribute("value");
+        Assert.assertEquals(enteredPassword, "12345678", "Password was not entered correctly!");
+
+        // Step 4: Click on the Login Button
+        loginPage.clickLogin();
+
+        // Step 5: Verify login success
+        // Wait for the next page to load and check for a specific element that signifies successful login
+        try {
+            Thread.sleep(3000); // Pause to allow for page load; WebDriverWait can be used for dynamic waits
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
+        // Verify that login is successful by checking the presence of a specific element on the dashboard
+        WebElement dashboardElement = driver.findElement(By.id("dashboard"));
+        Assert.assertTrue(dashboardElement.isDisplayed(), "Login failed or dashboard not loaded!");
+
+        // Step 6: Validate that a success message or user-specific element is displayed
+        WebElement greetingMessage = driver.findElement(By.id("greeting"));
+        String greetingText = greetingMessage.getText();
+        Assert.assertTrue(greetingText.contains("Welcome, aryasree"), "Login was successful, but greeting message is incorrect!");
+
+        // Step 7: Verify that the page title is as expected after a successful login
+        String pageTitle = driver.getTitle();
+        Assert.assertEquals(pageTitle, "User Dashboard - Example.com", "Page title after login is incorrect!");
+
+        // Step 8: Verify that the URL is correct after login
+        String currentURL = driver.getCurrentUrl();
+        Assert.assertTrue(currentURL.contains("dashboard"), "Login successful, but the URL is not correct!");
+
+        // Step 9: If required, perform logout and verify that logout is successful
+        WebElement logoutButton = driver.findElement(By.id("logout"));
+        logoutButton.click();
+
+        try {
+            Thread.sleep(2000); // Wait for the page to reload after logout
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
+        WebElement loginPageElement = driver.findElement(By.id("login"));
+        Assert.assertTrue(loginPageElement.isDisplayed(), "Logout failed, login page is not displayed!");
+
+        // If all assertions pass, the test is successful
+        System.out.println("Test completed successfully. Login and logout processes are validated.");
+    }
+}
